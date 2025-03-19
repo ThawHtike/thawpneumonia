@@ -78,7 +78,7 @@ def display_predictions(dataset, model, class_names, num_images=32, pages=4):
             plt.imshow(np.squeeze(images[i].numpy().astype("uint8")), cmap="gray")  # Show image
 
             # Set title with font size, bold, and two-line result
-            plt.title(f"True: {class_names[labels[i]]}\nPred: {class_names[predicted_labels[i]]}",
+            plt.title(f"True: {class_names[labels[i]]}\nPredicted: {class_names[predicted_labels[i]]}",
                       fontsize=8, fontweight='bold')
             plt.axis("off")
 
