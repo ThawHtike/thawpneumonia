@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -59,8 +58,8 @@ model = tf.keras.Sequential([
 ])
 
 # Function to visualize predictions
-def display_predictions(dataset, model, class_names, num_images=9):
-    plt.figure(figsize=(10, 10))
+def display_predictions(dataset, model, class_names, num_images=32):
+    plt.figure(figsize=(32, 32))
 
     # Loop over one batch of images and labels from the dataset
     for images, labels in dataset.take(1):  # Take one batch
@@ -68,7 +67,7 @@ def display_predictions(dataset, model, class_names, num_images=9):
         predicted_labels = np.argmax(predictions, axis=-1)  # Get the predicted class label
 
         for i in range(min(num_images, len(images))):  # Loop over the images in the batch
-            plt.subplot(3, 3, i + 1)
+            plt.subplot(11, 3, i + 1)
             plt.imshow(np.squeeze(images[i].numpy().astype("uint8")), cmap="gray")  # Show image
             plt.title(f"True: {class_names[labels[i]]}, Pred: {class_names[predicted_labels[i]]}")
             plt.axis("off")
@@ -76,5 +75,5 @@ def display_predictions(dataset, model, class_names, num_images=9):
     plt.show()
 
 # Call the function to display predictions
-display_predictions(test_ds, model, class_names, num_images=9)  # Adjust `num_images` to show more/less
+display_predictions(test_ds, model, class_names, num_images=32)  # Adjust `num_images` to show more/less
 
