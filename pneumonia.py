@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
+
 layers = tf.keras.layers  # Access layers from tf.keras
 
 train_dir = 'train'
@@ -45,7 +46,7 @@ test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 # Define the model
 model = tf.keras.Sequential([
-    layers.Rescaling(1./255),  # Rescaling layer
+    layers.Rescaling(1. / 255),  # Rescaling layer
     layers.Conv2D(32, 3, activation='relu'),  # Convolutional layer
     layers.MaxPooling2D(),
     layers.Conv2D(32, 3, activation='relu'),
@@ -57,23 +58,37 @@ model = tf.keras.Sequential([
     layers.Dense(2, activation='softmax')  # Output layer for binary classification
 ])
 
-# Function to visualize predictions
-def display_predictions(dataset, model, class_names, num_images=32):
+
+# Function to visualize predictions across pages
+def display_predictions(dataset, model, class_names, num_images=32, pages=4):
+    total_images = num_images * pages
     plt.figure(figsize=(32, 32))
 
-    # Loop over one batch of images and labels from the dataset
-    for images, labels in dataset.take(1):  # Take one batch
+    image_count = 0
+    for images, labels in dataset.take(total_images // batch_size):  # Take enough batches
+        if image_count >= total_images:
+            break
+
         predictions = model.predict(images)  # Get predictions for this batch
         predicted_labels = np.argmax(predictions, axis=-1)  # Get the predicted class label
 
-        for i in range(min(num_images, len(images))):  # Loop over the images in the batch
-            plt.subplot(11, 3, i + 1)
+        for i in range(min(batch_size, total_images - image_count)):  # Loop over the images in the batch
+            page_index = (image_count // num_images) + 1  # Which page are we on
+            plt.subplot(pages, num_images // pages, image_count % num_images + 1)
             plt.imshow(np.squeeze(images[i].numpy().astype("uint8")), cmap="gray")  # Show image
-            plt.title(f"True: {class_names[labels[i]]}, Pred: {class_names[predicted_labels[i]]}")
+
+            # Set title with font size, bold, and two-line result
+            plt.title(f"True: {class_names[labels[i]]}\nPred: {class_names[predicted_labels[i]]}",
+                      fontsize=8, fontweight='bold')
             plt.axis("off")
+
+            image_count += 1
+
+        if image_count >= total_images:
+            break
 
     plt.show()
 
-# Call the function to display predictions
-display_predictions(test_ds, model, class_names, num_images=32)  # Adjust `num_images` to show more/less
 
+# Call the function to display predictions over 4 pages
+display_predictions(test_ds, model, class_names, num_images=32, pages=4)  # Adjust `num_images` and `pages` as needed
